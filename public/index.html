@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<div id="root"></div>
+
+<!-- We need to load them so that our shims will work -->
+<script defer src="../node_modules/react/umd/react.development.js"></script>
+<script defer src="../node_modules/react-dom/umd/react-dom.development.js"></script>
+
+<script defer src="../node_modules/es-module-shims/dist/es-module-shims.js"></script>
+
+<script type="importmap-shim">
+{
+  "imports": {
+    "react": "../lib/react.development.js",
+    "react-dom": "../lib/react-dom.development.js"
+  }
+}
+
+</script>
+
+<script type="module-shim">
+  import "../build/index.js";
+</script>
+
+</body>
+</html>
