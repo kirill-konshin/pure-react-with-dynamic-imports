@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "npm run build -- --watch",
-    "build": "babel src --out-dir build --source-maps"
+    "build": "babel src --out-dir build --source-maps --copy-files"
   },
   "author": "Kirill Konshin",
   "license": "ISC",

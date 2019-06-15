@@ -23,5 +23,31 @@ self.addEventListener('fetch', (event) => {
                     })
                 })
         )
+    } else if (event.request.url.endsWith('.css')) {
+        event.respondWith(
+            fetch(event.request.url)
+                .then((response) => response.text())
+                .then((body) => {
+                    // Export the response body as a JavaSript string.
+                    // The response body has to be sanitized before turning it
+                    // into JavaScript code.
+                    // Credits: https://stackoverflow.com/a/22837870
+                    const newBody = `
+                        const head = document.getElementsByTagName('head')[0];
+                        const style = document.createElement('style');
+                        style.setAttribute('type', 'text/css');
+                        style.appendChild(document.createTextNode("${JSON.stringify(body).slice(1, -1)}"));
+                        head.appendChild(style);
+                        export default null;`;
+
+                    // Replace the original response with an ES6 module
+                    return new Response(newBody, {
+                        headers: new Headers({
+                            'Content-Type': 'application/javascript'
+                        })
+                    })
+                })
+        )
     }
+
 });
