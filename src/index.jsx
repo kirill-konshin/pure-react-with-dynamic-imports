@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 (async () => {
-    const {Panel} = await import('./Panel.js');
-    const {Button} = await import('./Button.js');
+    const {Panel} = await import('./Panel.jsx');
+    const {Button} = await import('./Button.jsx');
     const root = document.getElementById('root');
     ReactDOM.render((
         <div>

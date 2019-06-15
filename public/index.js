@@ -4,7 +4,9 @@ if ('serviceWorker' in navigator) {
         try {
 
             const registration = await navigator.serviceWorker.register('sw.js');
-            await import("../build/index.js");
+            await import("../src/index.jsx");
+            // or use built version
+            // await import("../build/index.js");
 
         } catch (error) {
             console.error('Service worker registration failed', error);

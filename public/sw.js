@@ -1,3 +1,5 @@
+importScripts('../node_modules/@babel/standalone/babel.js');
+
 self.addEventListener('activate', event => {
     //@see https://developers.google.com/web/fundamentals/primers/service-workers/lifecycle
     clients.claim();
@@ -47,6 +49,27 @@ self.addEventListener('fetch', (event) => {
                         })
                     })
                 })
+        )
+    } else if (event.request.url.endsWith('.jsx')) {
+        event.respondWith(
+            fetch(event.request.url)
+                .then((response) => response.text())
+                .then((body) => new Response(
+                    Babel.transform(body, {
+                        presets: [
+                            'react',
+                        ],
+                        plugins: [
+                            'syntax-dynamic-import'
+                        ],
+                        sourceMaps: true
+                    }).code,
+                    { //TODO Cache
+                        headers: new Headers({
+                            'Content-Type': 'application/javascript'
+                        })
+                    })
+                )
         )
     }
 
