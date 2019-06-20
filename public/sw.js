@@ -1,13 +1,10 @@
 importScripts('../node_modules/@babel/standalone/babel.js');
 
-// this is needed to activate the worker immediately without reload
-//@see https://developers.google.com/web/fundamentals/primers/service-workers/lifecycle
-self.addEventListener('activate', event => clients.claim());
+const {globalMap} = JSON.parse((decodeURIComponent(self.location.search) || '?{}').substr(1));
 
-const globalMap = {
-    'react': 'React',
-    'react-dom': 'ReactDOM'
-};
+//this is needed to activate the worker immediately without reload
+//@see https://developers.google.com/web/fundamentals/primers/service-workers/lifecycle
+self.addEventListener('activate', event => self.clients.claim());
 
 const getGlobalByUrl = (url) => Object.keys(globalMap).reduce((res, key) => {
     if (res) return res;
@@ -16,6 +13,8 @@ const getGlobalByUrl = (url) => Object.keys(globalMap).reduce((res, key) => {
 }, null);
 
 const matchUrl = (url, key) => url.includes(`/${key}/`);
+
+const removeSpaces = str => str.split(/^ +/m).join('').trim();
 
 self.addEventListener('fetch', (event) => {
 
@@ -27,14 +26,14 @@ self.addEventListener('fetch', (event) => {
         event.respondWith(
             fetch(url)
                 .then(response => response.text())
-                .then(body => new Response(`
+                .then(body => new Response(removeSpaces(`
                         const head = document.getElementsByTagName('head')[0];
                         const script = document.createElement('script');
-                        script.innerHTML = "${JSON.stringify(body).slice(1, -1)}";
                         script.setAttribute('type', 'text/javascript');
+                        script.appendChild(document.createTextNode(${JSON.stringify(body)}));
                         head.appendChild(script);
                         export default window.${getGlobalByUrl(url)};
-                    `, {
+                    `), {
                         headers: new Headers({
                             'Content-Type': 'application/javascript'
                         })
@@ -45,16 +44,14 @@ self.addEventListener('fetch', (event) => {
         event.respondWith(
             fetch(event.request.url)
                 .then(response => response.text())
-                .then(body => new Response(
-                    //TODO We don't track instances, so 2x import will result in 2x <style> tags
-                    `
+                .then(body => new Response(removeSpaces(`
                         const head = document.getElementsByTagName('head')[0];
                         const style = document.createElement('style');
                         style.setAttribute('type', 'text/css');
-                        style.appendChild(document.createTextNode("${JSON.stringify(body).slice(1, -1)}"));
+                        style.appendChild(document.createTextNode(${JSON.stringify(body)}));
                         head.appendChild(style);
-                        export default null;
-                    `,
+                        export default null; // here we can export CSS module instead
+                    `),
                     {
                         headers: new Headers({
                             'Content-Type': 'application/javascript'
