@@ -1,6 +1,6 @@
-importScripts('../node_modules/@babel/standalone/babel.js');
+const {globalMap, production} = JSON.parse((decodeURIComponent(self.location.search) || '?{}').substr(1));
 
-const {globalMap} = JSON.parse((decodeURIComponent(self.location.search) || '?{}').substr(1));
+if (!production) importScripts('../node_modules/@babel/standalone/babel.js');
 
 //this is needed to activate the worker immediately without reload
 //@see https://developers.google.com/web/fundamentals/primers/service-workers/lifecycle
@@ -18,11 +18,18 @@ const removeSpaces = str => str.split(/^ +/m).join('').trim();
 
 self.addEventListener('fetch', (event) => {
 
-    const {request: {url}} = event;
+    let {request: {url}} = event;
 
-    console.log('Req', url);
+    const fileName = url.split('/').pop();
+    const ext = fileName.includes('.') ? url.split('.').pop() : '';
 
-    if (Object.keys(globalMap).some(key => matchUrl(url, key))) {
+    if (!ext) {
+        url = url + '.js' + (url.includes('/src/') ? 'x' : '');
+    }
+
+    console.log('Req', url, ext);
+
+    if (globalMap && Object.keys(globalMap).some(key => matchUrl(url, key))) {
         event.respondWith(
             fetch(url)
                 .then(response => response.text())
@@ -40,9 +47,9 @@ self.addEventListener('fetch', (event) => {
                     })
                 )
         )
-    } else if (event.request.url.endsWith('.css')) {
+    } else if (url.endsWith('.css')) {
         event.respondWith(
-            fetch(event.request.url)
+            fetch(url)
                 .then(response => response.text())
                 .then(body => new Response(removeSpaces(`
                         const head = document.getElementsByTagName('head')[0];
@@ -59,9 +66,9 @@ self.addEventListener('fetch', (event) => {
                     })
                 )
         )
-    } else if (event.request.url.endsWith('.jsx')) {
+    } else if (url.endsWith('.jsx')) {
         event.respondWith(
-            fetch(event.request.url)
+            fetch(url)
                 .then(response => response.text())
                 .then(body => new Response(
                     //TODO Cache
@@ -74,6 +81,19 @@ self.addEventListener('fetch', (event) => {
                         ],
                         sourceMaps: true
                     }).code,
+                    {
+                        headers: new Headers({
+                            'Content-Type': 'application/javascript'
+                        })
+                    })
+                )
+        )
+    } else if (url.endsWith('.js')) { // rewrite for import('./Panel') with no extension
+        event.respondWith(
+            fetch(url)
+                .then(response => response.text())
+                .then(body => new Response(
+                    body,
                     {
                         headers: new Headers({
                             'Content-Type': 'application/javascript'

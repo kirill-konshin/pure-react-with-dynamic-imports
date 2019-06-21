@@ -1,0 +1,20 @@
+{
+  "presets": [
+    "@babel/preset-react"
+  ],
+  "plugins": [
+    "@babel/plugin-syntax-dynamic-import",
+    [
+      "babel-plugin-module-resolver",
+      {
+        "root": [
+          "."
+        ],
+        "alias": {
+          "react": "./node_modules/react/umd/react.development.js",
+          "react-dom": "./node_modules/react-dom/umd/react-dom.development.js"
+        }
+      }
+    ]
+  ]
+}
