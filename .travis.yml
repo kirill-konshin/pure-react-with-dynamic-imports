@@ -1,0 +1,18 @@
+language: node_js
+
+node_js: stable
+
+cache:
+  npm: true
+
+script:
+  - ./build.sh
+  - 'echo "exclude: []" > build/_config.yml' # @see https://github.blog/2016-11-02-what-s-new-in-github-pages-with-jekyll-3-3/
+
+deploy:
+- provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  local-dir: build
+  on:
+    branch: master
