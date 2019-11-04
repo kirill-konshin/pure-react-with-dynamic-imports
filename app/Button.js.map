@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/app/Button.jsx"],"names":["React","Button","children"],"mappings":"AAAA,OAAOA,KAAP;AACA;AAEA,OAAO,MAAMC,MAAM,GAAG,CAAC;AAACC,EAAAA;AAAD,CAAD,KAAgB,oCAASA,QAAT,CAA/B","sourcesContent":["import React from 'react';\nimport './Button.css';\n\nexport const Button = ({children}) => <button>{children}</button>;"],"file":"Button.js"}

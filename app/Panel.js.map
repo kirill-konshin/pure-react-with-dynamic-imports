@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/app/Panel.jsx"],"names":["React","Button","Panel"],"mappings":"AAAA,OAAOA,KAAP;AACA,SAAQC,MAAR;AAEA,OAAO,MAAMC,KAAK,GAAG,MAAM,iCAAK,oBAAC,MAAD,mBAAL,CAApB","sourcesContent":["import React from 'react';\nimport {Button} from './Button';\n\nexport const Panel = () => <div><Button>In Panel</Button></div>;"],"file":"Panel.js"}
